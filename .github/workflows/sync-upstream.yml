@@ -21,11 +21,20 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Sync
+      - name: Sync with upstream
         run: |
-          git remote add upstream https://github.com/ZhuLinsen/daily_stock_analysis.git 2>/dev/null || true
+          # 直接从 GITHUB_REF 解析当前分支名，例如 refs/heads/main -> main
+          DEFAULT_BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "当前分支: $DEFAULT_BRANCH"
+
+          # 重新设置 upstream 远程地址，确保指向真实上游
+          git remote remove upstream 2>/dev/null || true
+          git remote add upstream https://github.com/ZhuLinsen/daily_stock_analysis.git
+
+          # 拉取上游最新代码
           git fetch upstream
-          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@refs/remotes/origin/@@')
+
+          # 切换到默认分支并做快进合并
           git checkout "$DEFAULT_BRANCH"
-          git merge upstream/"$DEFAULT_BRANCH" --ff-only
+          git merge "upstream/$DEFAULT_BRANCH" --ff-only
           git push origin "$DEFAULT_BRANCH"
