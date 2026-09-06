@@ -1,0 +1,31 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'   # 每周一 UTC 12:00（北京时间 20:00）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync
+        run: |
+          git remote add upstream https://github.com/上游作者/上游项目名.git 2>/dev/null || true
+          git fetch upstream
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@refs/remotes/origin/@@')
+          git checkout "$DEFAULT_BRANCH"
+          git merge upstream/"$DEFAULT_BRANCH" --ff-only
+          git push origin "$DEFAULT_BRANCH"
