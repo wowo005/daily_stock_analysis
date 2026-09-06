@@ -23,7 +23,7 @@ jobs:
 
       - name: Sync
         run: |
-          git remote add upstream https://github.com/上游作者/上游项目名.git 2>/dev/null || true
+          git remote add upstream https://github.com/ZhuLinsen/daily_stock_analysis.git 2>/dev/null || true
           git fetch upstream
           DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@refs/remotes/origin/@@')
           git checkout "$DEFAULT_BRANCH"
